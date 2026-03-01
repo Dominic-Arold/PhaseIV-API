@@ -1,6 +1,6 @@
 import asyncio
-from phaseivAPI.scrapper.client import PhaseivClient
-from phaseivAPI.scrapper.parser import Film
+from phaseIV.scrapper.client import PhaseivClient
+from phaseIV.scrapper.parser import Film
 
 def _run(coro_fn, **client_kwargs):
     async def _inner():

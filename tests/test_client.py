@@ -3,8 +3,8 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from phaseivAPI.scrapper.client import PhaseivClient, FilmScraperError, FilmNotFoundError
-from phaseivAPI.scrapper.parser import Film, parse_search_result, parse_film_information
+from phaseIV.scrapper.client import PhaseivClient, FilmScraperError, FilmNotFoundError
+from phaseIV.scrapper.parser import Film, parse_search_result, parse_film_information
 
 
 def make_response(content: str, status_code: int = 200):

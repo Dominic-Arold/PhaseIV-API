@@ -1,7 +1,7 @@
 import pytest
 
-from phaseivAPI import PhaseivClient
-from phaseivAPI.scrapper.parser import Film, Status
+from phaseIV import PhaseivClient
+from phaseIV.scrapper.parser import Film, Status
 
 
 @pytest.fixture

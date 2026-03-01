@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import diskcache
 from pathlib import Path
 from datetime import timedelta
-from phaseivAPI.scrapper.parser import parse_search_result, parse_film_information, Film
+from phaseIV.scrapper.parser import parse_search_result, parse_film_information, Film
 
 
 class FilmScraperError(Exception):
@@ -24,7 +24,7 @@ class PhaseivClient:
     SEARCH_ENDPOINT = "/cgi-bin/suchen5.pl"
     FILM_ENDPOINT = "/cgi-bin/film5.pl"
 
-    DEFAULT_CACHE_DIR = Path.home() / ".cache" / "phaseivAPI"
+    DEFAULT_CACHE_DIR = Path.home() / ".cache" / "phaseIV"
     DEFAULT_TTL = timedelta(hours=24)
 
     def __init__(
