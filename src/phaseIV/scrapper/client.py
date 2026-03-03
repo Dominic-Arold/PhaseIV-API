@@ -4,7 +4,9 @@ from bs4 import BeautifulSoup
 import diskcache
 from pathlib import Path
 from datetime import timedelta
+
 from phaseIV.scrapper.parser import parse_search_result, parse_film_information, Film
+from phaseIV.config import settings
 
 
 class FilmScraperError(Exception):
@@ -24,9 +26,6 @@ class PhaseivClient:
     SEARCH_ENDPOINT = "/cgi-bin/suchen5.pl"
     FILM_ENDPOINT = "/cgi-bin/film5.pl"
 
-    DEFAULT_CACHE_DIR = Path.home() / ".cache" / "phaseIV"
-    DEFAULT_TTL = timedelta(hours=24)
-
     def __init__(
         self,
         timeout: float = 10.0,
@@ -36,15 +35,15 @@ class PhaseivClient:
     ):
         self.timeout = timeout
         self.cache_enabled = cache_enabled
-        self.cache_ttl = (cache_ttl or self.DEFAULT_TTL).total_seconds()
+        self.cache_ttl = (cache_ttl or settings.cache_ttl).total_seconds()
 
         self.client = httpx.AsyncClient(
             timeout=timeout,
             follow_redirects=True,
-            headers={'User-Agent': 'Phase4API/0.1.0'}
+            headers={'User-Agent': 'PhaseIV-API/0.1.0'}
         )
 
-        cache_path = cache_dir or self.DEFAULT_CACHE_DIR
+        cache_path = cache_dir or settings.cache_dir
         self._cache = diskcache.Cache(str(cache_path)) if cache_enabled else None
 
         # Per-key asyncio locks to prevent redundant concurrent fetches
