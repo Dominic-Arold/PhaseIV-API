@@ -6,12 +6,22 @@ services:
     volumes:
       - phaseiv_cache:/cache
     environment:
-      CACHE_DIR: /cache
-      CACHE_ENABLED: "true"
-      HTTP_TIMEOUT: "10"
+      PHASEIV_CACHE_DIR: /cache
+      PHASEIV_CACHE_ENABLED: "true"
+      PHASEIV_HTTP_TIMEOUT: "10"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

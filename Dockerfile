@@ -1,20 +1,19 @@
-FROM python:3.10-slim
+FROM python:3.10.17-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.10.7 /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-COPY pyproject.toml uv.lock ./
-COPY README.md ./
+# Copy dependency files and README before installing so that changes to src/
+# do not bust the uv sync cache layer.
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --no-dev --frozen --no-cache
+
 COPY src/ ./src/
 
-RUN uv sync --no-dev --frozen
-
-VOLUME ["/cache"]
-
-ENV CACHE_DIR=/cache \
-    CACHE_ENABLED=true \
-    HTTP_TIMEOUT=10
+# Run as a non-root user to limit blast radius if the app is compromised.
+RUN adduser --disabled-password --no-create-home appuser
+USER appuser
 
 EXPOSE 80
 
