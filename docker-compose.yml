@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    ports:
+      - "55555:80"
+    volumes:
+      - phaseiv_cache:/cache
+    environment:
+      CACHE_DIR: /cache
+      CACHE_ENABLED: "true"
+      HTTP_TIMEOUT: "10"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  phaseiv_cache:
