@@ -68,6 +68,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Optional: cache layers between runs to speed up builds
+          build-args: VERSION=${{ steps.meta.outputs.version }}  # strips the leading "v" automatically
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -4,6 +4,9 @@ COPY --from=ghcr.io/astral-sh/uv:0.10.7 /uv /usr/local/bin/uv
 
 WORKDIR /app
 
+ARG VERSION=0.0.0
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PHASEIV_API=${VERSION}
+
 # Copy dependency files and README before installing so that changes to src/
 # do not bust the uv sync cache layer.
 COPY pyproject.toml uv.lock README.md ./
