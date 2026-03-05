@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"   # triggers on v0.2.0, v1.0.0, etc.
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - uses: astral-sh/setup-uv@v5
+
+      - run: uv sync --all-groups
+
+      - run: uv run pytest
+
+  docker:
+    needs: test   # never push a broken image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write   # needed to push to GHCR
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Generates image tags from the git tag:
+      #   v1.2.3  →  ghcr.io/<owner>/<repo>:1.2.3
+      #              ghcr.io/<owner>/<repo>:1.2
+      #              ghcr.io/<owner>/<repo>:1
+      #              ghcr.io/<owner>/<repo>:latest
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}   # built-in, no setup needed
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Optional: cache layers between runs to speed up builds
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

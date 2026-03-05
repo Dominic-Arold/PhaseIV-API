@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+# dynamic versioning generated file
+src/phaseIV/_version.py
