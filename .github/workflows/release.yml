@@ -58,6 +58,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}   # built-in, no setup needed
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3   # switches to docker-container driver, required for GHA cache
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
