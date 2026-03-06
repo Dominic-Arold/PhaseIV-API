@@ -1,14 +1,14 @@
 services:
   api:
-    build: .
+    image: ghcr.io/dominic-arold/phaseiv-api:latest
     ports:
       - "55555:80"
     volumes:
       - phaseiv_cache:/cache
-    environment:
-      PHASEIV_CACHE_DIR: /cache
-      PHASEIV_CACHE_ENABLED: "true"
-      PHASEIV_HTTP_TIMEOUT: "10"
+    # Optionally to change defaults
+    #environment:
+    #  PHASEIV_CACHE_ENABLED: "true"
+    #  PHASEIV_HTTP_TIMEOUT: "10"
     restart: unless-stopped
     deploy:
       resources:
