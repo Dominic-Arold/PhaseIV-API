@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"   # triggers on v0.2.0, v1.0.0, etc.
+      - "v*.*.*"
 
 jobs:
   test:
@@ -23,24 +23,41 @@ jobs:
 
       - run: uv run pytest
 
-  docker:
-    needs: test   # never push a broken image
+  publish:
+    needs: test
     runs-on: ubuntu-latest
 
+    environment: pypi   # GitHub environment gate — configure on github.com/settings/environments
+                        # Must match the environment name registered on pypi.org trusted publisher
+
     permissions:
-      contents: read
-      packages: write   # needed to push to GHCR
+      id-token: write   # required for OIDC trusted publishing — no API token needed
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # hatch-vcs needs full tag history to resolve the version
 
-      # Generates image tags from the git tag:
-      #   v1.2.3  →  ghcr.io/<owner>/<repo>:1.2.3
-      #              ghcr.io/<owner>/<repo>:1.2
-      #              ghcr.io/<owner>/<repo>:1
-      #              ghcr.io/<owner>/<repo>:latest
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Build wheel and sdist
+        run: uv build   # outputs to dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  docker:
+    needs: publish
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        # No fetch-depth: 0 needed — we derive the version from the tag name, not git history
+
       - name: Extract image metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -51,12 +68,20 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
 
+      # PyPI may take up to ~60s to make a freshly published package available on the index.
+      # Without this, pip install in the docker build can fail with "version not found".
+      - name: Wait for PyPI propagation
+        run: sleep 60
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}   # built-in, no setup needed
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -65,6 +90,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Optional: cache layers between runs to speed up builds
+          build-args: VERSION=${{ steps.meta.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
