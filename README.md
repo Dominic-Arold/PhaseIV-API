@@ -1,7 +1,7 @@
 # PhaseIV API
 
-[![PyPI](https://img.shields.io/pypi/v/PhaseIV-API)](https://pypi.org/project/PhaseIV-API/)
-[![Python](https://img.shields.io/pypi/pyversions/PhaseIV-API)](https://pypi.org/project/PhaseIV-API/)
+[![PyPI](https://img.shields.io/pypi/v/phaseiv-api)](https://pypi.org/project/PhaseIV-API/)
+[![Python](https://img.shields.io/pypi/pyversions/phaseiv-api)](https://pypi.org/project/PhaseIV-API/)
 [![CI](https://github.com/dominic-arold/PhaseIV-API/actions/workflows/ci.yml/badge.svg)](https://github.com/dominic-arold/PhaseIV-API/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 

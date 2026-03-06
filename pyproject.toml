@@ -16,6 +16,9 @@ name = "PhaseIV-API"
 dynamic = ["version"]
 description = "Python async API client and REST server for the Phase IV film lending library."
 readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+]
 requires-python = ">=3.10"
 dependencies = [
     "bs4>=0.0.2",
