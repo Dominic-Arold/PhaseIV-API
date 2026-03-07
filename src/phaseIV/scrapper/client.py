@@ -197,20 +197,3 @@ class PhaseivClient:
         """Wipe the entire disk cache."""
         if self._cache:
             self._cache.clear()
-
-
-if __name__ == "__main__":
-
-    async def main():
-        async with PhaseivClient() as client:
-            client.clear_cache()
-            print("Searching for movie 'Soul'...")
-            list_id, films = await client.search_film("Soul")
-            print(films)
-
-            film_id = 17083
-            print(f"\nGetting film with ID {film_id}...")
-            film = await client.get_film(film_id)
-            print(film)
-
-    asyncio.run(main())
